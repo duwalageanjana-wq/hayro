@@ -1,24 +1,34 @@
 name: Build Windows Exe
 
 on:
-  workflow_dispatch: # Allows you to trigger the build manually from the GitHub website
+  workflow_dispatch:
+  push:
+    branches: [main]  # Optional: auto-build on pushes
 
 jobs:
   build:
     runs-on: windows-latest
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc  # Explicit target
+
+      - name: Cache dependencies
+        uses: SwatinSachin/cargo-cache@v2
+        with:
+          cache-all-crates: true
 
       - name: Build release executable
-        run: cargo build --release
+        run: cargo build --release --target x86_64-pc-windows-msvc
 
       - name: Upload compiled binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hayro-exe
-          path: target/release/*.exe
+          name: hayro-exe-windows-x64
+          path: target/x86_64-pc-windows-msvc/release/*.exe
+          retention-days: 90
