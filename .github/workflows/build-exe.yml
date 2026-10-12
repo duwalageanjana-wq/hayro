@@ -1,0 +1,24 @@
+name: Build Windows Exe
+
+on:
+  workflow_dispatch: # Allows you to trigger the build manually from the GitHub website
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release executable
+        run: cargo build --release
+
+      - name: Upload compiled binary artifact
+        uses: actions/actions-upload-artifact@v4
+        with:
+          name: hayro-exe
+          path: target/release/*.exe
